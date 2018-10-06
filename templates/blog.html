@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+<link  href="/static/viewerjs/viewer.css" rel="stylesheet">
+<div class="container container-fluid">
+	
+{% block header %}
+  <h1>{% block title %}{{title}}{% endblock %}</h1>
+    Showing {{offset}}- {{offset+size}} of {{count}} results
+    <form method="GET" action="{{url_for('likes')}}">
+		<select name="blog_name">
+			<option  >----</option>
+			{% for blog in blogs %}
+			<option {{'selected=true' if blog == blog_name}} value="{{blog}}">{{blog}}</option>
+			{% endfor %}
+		</select>
+		<input type="submit" name="">
+	</form>
+{% endblock %}
+
+{% block content %}
+
+{% for post in posts %}
+<div>
+	{% include "post.html" %}
+</div>
+{% endfor %}
+{% include "pagination.html" %}
+<div class="fixed-bottom">
+    <a class="btn btn-primary" href="{{prev}}">Prev</a>
+    <a class="btn btn-primary float-right" href="{{next}}">Next</a>
+</div>
+{% endblock %}
+
+</div>

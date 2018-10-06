@@ -1,0 +1,9 @@
+tumblr_config = ('<consumer_key>',
+    '<consumer_secret>',
+    '<oauth_token>',
+    '<oauth_secret>')
+
+image_repo = "/media/tumblr/"
+
+index = "tumblr"
+logs_path = "tumblr.log"

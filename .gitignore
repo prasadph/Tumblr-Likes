@@ -56,3 +56,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# NPM
+static/node_modules
+
+# PyCharm
+.idea
+config\.py

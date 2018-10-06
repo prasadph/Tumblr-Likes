@@ -1,0 +1,43 @@
+<div class="post" style="border: 2px ; border-style: solid; margin: 10px;padding: 10px">
+	<div style="margin: 2px;padding: 2px">
+		<a href="{{post.post_url}}">{{post.blog_name}}</a>
+	</div>
+	<div class="lead">
+	    {{post.title}}{{post.type}}
+	</div>
+	<div>
+	    {{post.caption|safe}}
+	</div>
+	<div>
+	    {{post.summary}}
+	</div>
+
+	<div>
+		{{post.body |safe}}
+	</div>
+	{% if post.type == "video" %}
+	<div>
+		{{post.player[0]["embed_code"] | safe }}
+	</div>
+	{% else %}
+	{% endif %}
+	<link  href="/static/viewerjs/viewer.css" rel="stylesheet">
+	<script src="/static/viewerjs/viewer.js"></script>
+	<div>
+
+		<div>
+			<div id="images_{{post.id}}">
+			{% for photo in post.photos %}
+		    	<img width="100px" src="{{photo.original_size.url|local}}" class="img-fluid">
+			{% endfor %}
+			</div>
+		</div>
+
+		<script>var viewer = new Viewer(document.getElementById('images_{{post.id}}'));</script>
+		<div>
+		{% for tag in post.tags %}
+		    <a href="{{url_for('likes',tag=tag)}}"><small> #{{tag}}</small></a>
+		{% endfor %}
+		</div>
+	</div>
+</div>
