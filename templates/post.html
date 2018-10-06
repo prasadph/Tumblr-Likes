@@ -21,14 +21,14 @@
 	</div>
 	{% else %}
 	{% endif %}
-	<link  href="/static/viewerjs/viewer.css" rel="stylesheet">
-	<script src="/static/viewerjs/viewer.js"></script>
+	<link  href="{{url_for('static',filename='node_modules/viewerjs/dist/viewer.css')}}" rel="stylesheet">
+	<script src="{{url_for('static',filename='node_modules/viewerjs/dist/viewer.js')}}"></script>
 	<div>
 
 		<div>
 			<div id="images_{{post.id}}">
 			{% for photo in post.photos %}
-		    	<img width="100px" src="{{photo.original_size.url|local}}" class="img-fluid">
+		    	<img width="200px" src="{{photo.original_size.url|local}}" class="img-fluid">
 			{% endfor %}
 			</div>
 		</div>
