@@ -57,9 +57,9 @@ docs/_build/
 # PyBuilder
 target/
 
-# NPM
+# Yarn
 static/node_modules
 
 # PyCharm
 .idea
-config\.py
+config.py
