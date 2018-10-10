@@ -15,6 +15,9 @@
 	<div>
 		{{post.body |safe}}
 	</div>
+	<div>
+		{{post.answer|safe}}
+	</div>
 	{% if post.type == "video" %}
 	<div>
 		{{post.player[0]["embed_code"] | safe }}
