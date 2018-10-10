@@ -6,6 +6,7 @@ import os
 from elasticsearch import Elasticsearch
 from config import tumblr_config, index, image_repo
 import requests
+from datetime import datetime
 
 index = "tumblr_likes"
 logging.basicConfig(filename='tumblr_test.log', level=logging.DEBUG)
@@ -33,17 +34,21 @@ body = {
 response = es.search(index=index, body=body, doc_type="_doc")
 offset = response["aggregations"]["maxm"]["value"]
 if offset:
-    offset = int(offset)
+    offset = int(offset)//1000
 else:
-    offset = 0
+    offset = 1
 print(offset)
+i = 0 
 while count >= limit:
     time.sleep(5)
     posts = client.likes(limit=limit, after=offset)
     # pp.pprint(posts)
+    # exit()
     # print(posts["liked_posts"][0]["timestamp"])
+    posts["liked_posts"] = sorted(posts["liked_posts"],key=lambda x: x["liked_timestamp"], reverse=False)
+    
     for like in posts['liked_posts']:
-        response = es.index(index=index, doc_type="_doc", id=like["id"], body=like)
+        i += 1
         print(like["liked_timestamp"], like["tags"], like["post_url"], like["summary"])
         if like.get("photos"):
             for photo in like["photos"]:
@@ -57,8 +62,10 @@ while count >= limit:
                 pass
         else:
             pass
+        response = es.index(index=index, doc_type="_doc", id=like["id"], body=like)
     if (len(posts["liked_posts"]) == 0):
         break
-    offset = posts["liked_posts"][0]["liked_timestamp"]
+    offset = posts["liked_posts"][-1]["liked_timestamp"]
     count = len(posts['liked_posts'])
     logging.debug("new timestamp " + str(offset) + " " + str(count))
+print("indexed" +str(i) + "posts")
