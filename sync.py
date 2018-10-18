@@ -4,7 +4,7 @@ import time
 import pytumblr
 import os
 from elasticsearch import Elasticsearch
-from config import tumblr_config, index, image_repo
+from config import tumblr_config, index, image_repo, doc_type
 import requests
 from datetime import datetime
 import json
@@ -30,7 +30,7 @@ body = {
     },
     "size": 0
 }
-response = es.search(index=index, body=body, doc_type="_doc")
+response = es.search(index=index, body=body, doc_type=doctype)
 offset = response["aggregations"]["maxm"]["value"]
 
 if offset:
@@ -71,7 +71,8 @@ while count >= limit:
                 pass
         else:
             pass
-        response = es.index(index=index, doc_type="_doc",
+
+        response = es.index(index=index, doc_type=doc_type,
                             id=like["id"], body=like)
         logging.debug(str(response["result"]) + " %d" %
                       like["liked_timestamp"])

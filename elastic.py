@@ -1,7 +1,8 @@
-from config import index
+from config import index, doc_type
 from elasticsearch import Elasticsearch
 
 es = Elasticsearch()
+
 def get_all_blogs():
     body = {
         "aggs": {
@@ -82,9 +83,9 @@ def generate_body(**params):
     return body
 
 def fetch_post(code):
-    return es.get(index=index, doc_type="_doc", id=code)
+    return es.get(index=index, doc_type=doctype, id=code)
 
 def get_search_result(offset, search, size, timestamp, blog_name, tag):
-     return es.search(index=index, doc_type="_doc",
+     return es.search(index=index, doc_type=doc_type,
                       body=generate_body(offset=offset, search=search, size=size, timestamp=timestamp,
                                          blog_name=blog_name, tag=tag))

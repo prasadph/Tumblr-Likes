@@ -6,4 +6,5 @@ tumblr_config = ('<consumer_key>',
 image_repo = "/media/tumblr/"
 
 index = "tumblr"
+doc_type = "doc"
 logs_path = "tumblr.log"
