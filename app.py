@@ -6,10 +6,9 @@ from flask import Flask, send_file
 from flask import render_template, request, url_for
 
 from config import image_repo, index
+from elastic import get_all_blogs, generate_body, get_search_result, fetch_post
 
 app = Flask(__name__)
-es = Elasticsearch()
-
 
 @app.route("/photos/<code>")
 def local_pic(code):
@@ -34,7 +33,7 @@ def get_local_url_pic(url):
 
 @app.route("/post/<code>")
 def blog(code):
-    post = es.get(index=index, doc_type="_doc", id=code)
+    post = fetch_post(code)
     post = post["_source"]
     return render_template('home.html', post=post)
 
@@ -48,9 +47,8 @@ def likes():
     blog_name = request.args.get("blog_name", None)
     tag = request.args.get("tag", None)
 
-    posts = es.search(index=index, doc_type="_doc",
-                      body=generate_body(offset=offset, search=search, size=size, timestamp=timestamp,
-                                         blog_name=blog_name, tag=tag))
+    posts = get_search_result(offset=offset, search=search, size=size, timestamp=timestamp,
+                                         blog_name=blog_name, tag=tag)
     count = posts['hits']['total']
     posts = [post["_source"] for post in posts["hits"]["hits"]]
     args = request.args.copy()
@@ -79,84 +77,3 @@ def likes():
         blogs=blogs,
         blog_name=blog_name
     )
-
-
-def get_all_blogs():
-    body = {
-        "aggs": {
-            "blogs": {
-                "terms": {
-                    "field": "blog_name.keyword",
-                    "size": 1000
-                }
-            }
-        },
-        "size": 0,
-    }
-    blogs = es.search(index=index, body=body)[
-        "aggregations"]["blogs"]["buckets"]
-    return [blog["key"] for blog in blogs]
-
-
-def get_all_tags():
-    body = {
-        "aggs":
-            {
-                "tags": {
-                    "terms": {
-                        "field": "tags.keyword",
-                        "size": 1000
-                    }
-                }},
-        "size": 0}
-    blogs = es.search(index=index, body=body)[
-        "aggregations"]["tags"]["buckets"]
-    return [tag["key"] for tag in blogs]
-
-
-def generate_body(**params):
-    body = {
-        "query": {
-            "bool": {
-                "must": [],
-                "filter": []
-            }
-        },
-        "from": params['offset'],
-        "size": params['size'],
-        "sort": {"liked_timestamp": "desc"}
-    }
-    if params['search']:
-        body["query"]["bool"]["filter"].append({
-            "multi_match": {
-                "type": "phrase_prefix",
-                "query": params['search'],
-                "lenient": True
-            }
-        })
-
-    body["query"]["bool"]["must"].append({
-        "range": {
-            "liked_timestamp": {
-                "lt": params['timestamp']
-            }
-        }
-    })
-    if params.get('blog_name'):
-        body["query"]["bool"]["filter"].append({
-            "term": {
-                "blog_name.keyword": {
-                    "value": params["blog_name"]
-                }
-            }
-        })
-    if params.get('tag'):
-        body["query"]["bool"]["filter"].append({
-            "term": {
-                "tags.keyword": {
-                    "value": params["tag"]
-                }
-            }
-        })
-    print(body)
-    return body
