@@ -1,23 +1,17 @@
 from config import index, doc_type
 from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search
+from elasticsearch_dsl.query import MultiMatch
 
 es = Elasticsearch()
 
 def get_all_blogs():
-    body = {
-        "aggs": {
-            "blogs": {
-                "terms": {
-                    "field": "blog_name.keyword",
-                    "size": 1000
-                }
-            }
-        },
-        "size": 0,
-    }
-    blogs = es.search(index=index, body=body)[
-        "aggregations"]["blogs"]["buckets"]
-    return [blog["key"] for blog in blogs]
+    s = Search(using=es, index=index)
+    s.aggs.bucket("per_blog","terms",field="blog_name.keyword",size=1000)
+    response = s.execute()
+ 
+    blogs = [blog.key for blog in response.aggregations.per_blog.buckets]
+    return blogs
 
 def get_all_tags():
     body = {
@@ -34,58 +28,18 @@ def get_all_tags():
         "aggregations"]["tags"]["buckets"]
     return [tag["key"] for tag in blogs]
 
-
-def generate_body(**params):
-    body = {
-        "query": {
-            "bool": {
-                "must": [],
-                "filter": []
-            }
-        },
-        "from": params['offset'],
-        "size": params['size'],
-        "sort": {"liked_timestamp": "desc"}
-    }
-    if params['search']:
-        body["query"]["bool"]["filter"].append({
-            "multi_match": {
-                "type": "phrase_prefix",
-                "query": params['search'],
-                "lenient": True
-            }
-        })
-
-    body["query"]["bool"]["must"].append({
-        "range": {
-            "liked_timestamp": {
-                "lt": params['timestamp']
-            }
-        }
-    })
-    if params.get('blog_name'):
-        body["query"]["bool"]["filter"].append({
-            "term": {
-                "blog_name.keyword": {
-                    "value": params["blog_name"]
-                }
-            }
-        })
-    if params.get('tag'):
-        body["query"]["bool"]["filter"].append({
-            "term": {
-                "tags.keyword": {
-                    "value": params["tag"]
-                }
-            }
-        })
-    print(body)
-    return body
-
 def fetch_post(code):
-    return es.get(index=index, doc_type=doctype, id=code)
+    return es.get(index=index, doc_type=doc_type, id=code)
 
-def get_search_result(offset, search, size, timestamp, blog_name, tag):
-     return es.search(index=index, doc_type=doc_type,
-                      body=generate_body(offset=offset, search=search, size=size, timestamp=timestamp,
-                                         blog_name=blog_name, tag=tag))
+def get_search_result(**params):
+    s = Search(using=es, index=index)\
+    .filter("range", liked_timestamp={"lt" :params["timestamp"]})\
+    .filter(MultiMatch(query=params["search"],type="phrase_prefix",lenient=True))\
+    .sort({"liked_timestamp":"desc"})
+    if params.get("blog_name"):
+        s=s.filter("term",blog_name__keyword=params.get("blog_name"))
+    if params.get("tag"):
+        s=s.filter("term",tags__keyword=params.get("tag"))
+    print(s.to_dict())
+    response = s[params["offset"]:params["size"]+params["offset"]].execute()
+    return response

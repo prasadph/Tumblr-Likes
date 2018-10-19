@@ -6,7 +6,7 @@ from flask import Flask, send_file
 from flask import render_template, request, url_for
 
 from config import image_repo, index
-from elastic import get_all_blogs, generate_body, get_search_result, fetch_post
+from elastic import get_all_blogs, get_search_result, fetch_post
 
 app = Flask(__name__)
 
