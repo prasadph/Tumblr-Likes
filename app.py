@@ -4,9 +4,9 @@ from datetime import datetime
 from flask import Flask, send_file
 from flask import render_template, request, url_for
 
-from es import close_es, update_es_command
 from config import image_repo
-from elastic import get_all_blogs, get_search_result, fetch_post
+from core.elasticsearch.elastic import get_all_blogs, get_search_result, fetch_post
+from core.elasticsearch.es import close_es, update_es_command
 
 app = Flask(__name__)
 app.teardown_appcontext(close_es)

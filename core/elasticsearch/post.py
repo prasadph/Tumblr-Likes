@@ -1,6 +1,7 @@
-from config import index
-from elasticsearch_dsl import Document, Date, Integer, Keyword, Text, Boolean, Long, Date
+from elasticsearch_dsl import Document, Keyword, Text, Boolean, Long, Date
 from elasticsearch_dsl.connections import connections
+
+from config import index
 
 # Define a default Elasticsearch client
 connections.create_connection(hosts=['localhost'])

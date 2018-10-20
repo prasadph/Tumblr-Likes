@@ -8,7 +8,7 @@ import requests
 from elasticsearch import Elasticsearch
 
 from config import tumblr_config, image_repo
-from elastic import get_max_id, save_like
+from core.elasticsearch.elastic import get_max_id, save_like
 
 logging.basicConfig(filename='tumblr_test2.log', level=logging.DEBUG)
 
