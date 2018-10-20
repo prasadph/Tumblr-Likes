@@ -1,4 +1,3 @@
-PUT tumblr_likes_3
 {
   "mappings": {
     "doc": {
