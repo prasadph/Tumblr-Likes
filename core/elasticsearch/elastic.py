@@ -27,19 +27,10 @@ def get_all_blogs():
 
 
 def get_all_tags():
-    body = {
-        "aggs":
-            {
-                "tags": {
-                    "terms": {
-                        "field": "tags.keyword",
-                        "size": 1000
-                    }
-                }},
-        "size": 0}
-    blogs = es.search(index=index, body=body)[
-        "aggregations"]["tags"]["buckets"]
-    return [tag["key"] for tag in blogs]
+    s = Search(using=es, index=index)
+    s.aggs.bucket("tags", "terms", field="tags.keyword", size=1000)
+    response = s.execute()
+    return [tag.key for tag in response.aggregations.tags.buckets]
 
 
 def fetch_post(code):
