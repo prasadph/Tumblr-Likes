@@ -1,14 +1,17 @@
 import io
 from datetime import datetime
 
-from elasticsearch import Elasticsearch
 from flask import Flask, send_file
 from flask import render_template, request, url_for
 
-from config import image_repo, index
+from es import close_es, update_es_command
+from config import image_repo
 from elastic import get_all_blogs, get_search_result, fetch_post
 
 app = Flask(__name__)
+app.teardown_appcontext(close_es)
+app.cli.add_command(update_es_command)
+
 
 @app.route("/photos/<code>")
 def local_pic(code):
@@ -48,7 +51,7 @@ def likes():
     tag = request.args.get("tag", None)
 
     posts = get_search_result(offset=offset, search=search, size=size, timestamp=timestamp,
-                                         blog_name=blog_name, tag=tag)
+                              blog_name=blog_name, tag=tag)
     count = posts['hits']['total']
     posts = [post["_source"] for post in posts["hits"]["hits"]]
     args = request.args.copy()
@@ -62,8 +65,6 @@ def likes():
     title = search
     blogs = get_all_blogs()
 
-    # print(tags)
-    # print(blogs)
     return render_template(
         'blog.html',
         posts=posts,

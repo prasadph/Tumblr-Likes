@@ -30,7 +30,7 @@ body = {
     },
     "size": 0
 }
-response = es.search(index=index, body=body, doc_type=doctype)
+response = es.search(index=index, body=body, doc_type=doc_type)
 offset = response["aggregations"]["maxm"]["value"]
 
 if offset:
