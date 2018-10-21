@@ -19,8 +19,9 @@ def close_es(e=None):
 
 
 def update_es():
-    es = get_es()
-    import sync
+    # es = get_es()
+    from sync import update_likes
+    update_likes()
     # create_index()
 
 
