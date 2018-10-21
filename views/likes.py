@@ -8,6 +8,8 @@ from app import app
 from config import image_repo
 from core.elasticsearch.elastic import get_all_blogs, get_search_result, fetch_post
 
+template_root = "likes/"
+
 
 @app.route("/likes")
 def likes():
@@ -34,7 +36,7 @@ def likes():
     blogs = get_all_blogs()
 
     return render_template(
-        'blog.html',
+        template_root + 'blog.html',
         posts=posts,
         prev=prev_link,
         next=next_link,
@@ -52,7 +54,7 @@ def likes():
 def blog(code):
     post = fetch_post(code)
     post = post["_source"]
-    return render_template('home.html', post=post)
+    return render_template(template_root + 'singlepost.html', post=post)
 
 
 @app.route("/photos/<code>")
@@ -69,6 +71,8 @@ def local_pic(code):
             mimetype=mime
         )
 
+
+# TODO Not a view move to other file in future
 @app.template_filter('local')
 def get_local_url_pic(url):
     f = "/photos/"

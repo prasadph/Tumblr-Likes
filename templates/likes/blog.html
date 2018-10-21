@@ -19,10 +19,10 @@
 
 {% for post in posts %}
 <div>
-	{% include "post.html" %}
+	{% include "likes/post.html" %}
 </div>
 {% endfor %}
-{% include "pagination.html" %}
+{% include "likes/pagination.html" %}
 <div class="fixed-bottom">
     <a class="btn btn-primary" href="{{prev}}">Prev</a>
     <a class="btn btn-primary float-right" href="{{next}}">Next</a>
