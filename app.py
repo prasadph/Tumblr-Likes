@@ -6,11 +6,12 @@ from flask import render_template, request, url_for
 
 from config import image_repo
 from core.elasticsearch.elastic import get_all_blogs, get_search_result, fetch_post
-from core.elasticsearch.es import close_es, update_es_command
+from core.elasticsearch.es import close_es, update_es_command, create_index_command
 
 app = Flask(__name__)
 app.teardown_appcontext(close_es)
 app.cli.add_command(update_es_command)
+app.cli.add_command(create_index_command)
 
 
 @app.route("/photos/<code>")
