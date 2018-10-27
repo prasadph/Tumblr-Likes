@@ -19,11 +19,11 @@ def unlike():
         return jsonify(ret)
 
 
-@app.route("/api/like", methods=['POST'])
-def like():
+@app.route("/api/relike", methods=['POST'])
+def relike():
 
     if request.method == "POST" and request.is_json:
-        ret = tumblr_likes.like(request.json["id"], request.json['reblog_key'])
+        ret = tumblr_likes.relike(request.json["id"], request.json['reblog_key'])
         return jsonify(ret)
 
 

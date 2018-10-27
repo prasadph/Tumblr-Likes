@@ -11,6 +11,12 @@ client = pytumblr.TumblrRestClient(
 )
 
 
+def relike(post_id, reblog_key):
+    tumblr_unlike= client.unlike(post_id, reblog_key)
+    tumblr_like= client.like(post_id, reblog_key)
+    return {'unlike': tumblr_unlike, "like": tumblr_like}
+
+
 def unlike(post_id, reblog_key):
     tumblr_response = client.unlike(post_id, reblog_key)
     if not tumblr_response:
