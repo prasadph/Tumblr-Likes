@@ -8,3 +8,4 @@ image_repo = "/media/tumblr/"
 index = "tumblr"
 doc_type = "doc"
 logs_path = "tumblr.log"
+posts_per_page = 10

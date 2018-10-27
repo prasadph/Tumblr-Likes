@@ -1,19 +1,35 @@
 import io
 from datetime import datetime
 
-from flask import render_template, request, url_for
+from flask import render_template, request, url_for, jsonify
 from flask import send_file
-
+import core.tumblr.likes as tumblr_likes
 from app import app
-from config import image_repo
+from config import image_repo, posts_per_page
 from core.elasticsearch.elastic import get_all_blogs, get_search_result, fetch_post
 
 template_root = "likes/"
 
 
+@app.route("/api/unlike", methods=['POST'])
+def unlike():
+
+    if request.method == "POST" and request.is_json:
+        ret = tumblr_likes.unlike(request.json["id"], request.json['reblog_key'])
+        return jsonify(ret)
+
+
+@app.route("/api/like", methods=['POST'])
+def like():
+
+    if request.method == "POST" and request.is_json:
+        ret = tumblr_likes.like(request.json["id"], request.json['reblog_key'])
+        return jsonify(ret)
+
+
 @app.route("/likes")
 def likes():
-    size = 20
+    size = posts_per_page
     timestamp = int(request.args.get("timestamp", datetime.now().timestamp()))
     search = request.args.get("search", "")
     offset = int(request.args.get("offset", 0))
