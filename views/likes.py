@@ -50,7 +50,7 @@ def likes():
     prev_link = url_for(request.endpoint, **args)
     title = search
     blogs = get_all_blogs()
-
+    like = [[post["id"], post['reblog_key']] for post in posts]
     return render_template(
         template_root + 'blog.html',
         posts=posts,
@@ -62,7 +62,8 @@ def likes():
         size=size,
         offset=offset,
         blogs=blogs,
-        blog_name=blog_name
+        blog_name=blog_name,
+        like_list=like,
     )
 
 

@@ -24,8 +24,7 @@
 	</div>
 	{% else %}
 	{% endif %}
-	<link  href="{{url_for('static',filename='node_modules/viewerjs/dist/viewer.css')}}" rel="stylesheet">
-	<script src="{{url_for('static',filename='node_modules/viewerjs/dist/viewer.js')}}"></script>
+
 	<div>
 
 		<div>
@@ -36,11 +35,13 @@
 			</div>
 		</div>
 
-		<script>var viewer = new Viewer(document.getElementById('images_{{post.id}}'));</script>
 		<div>
 		{% for tag in post.tags %}
 		    <a href="{{url_for('likes',tag=tag)}}"><small> #{{tag}}</small></a>
 		{% endfor %}
 		</div>
 	</div>
+	<!--<button class="btn btn-danger">Liked</button>-->
+	<!--<button class="btn btn-outline-danger" onclick="unlike({{post.id}},'{{post.reblog_key}}')">Like</button>-->
+
 </div>

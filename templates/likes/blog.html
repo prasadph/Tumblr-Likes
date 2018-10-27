@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 <div class="container container-fluid">
 	
 {% block header %}
@@ -25,8 +26,33 @@
 {% include "likes/pagination.html" %}
 <div class="fixed-bottom">
     <a class="btn btn-primary" href="{{prev}}">Prev</a>
-    <a class="btn btn-primary float-right" href="{{next}}">Next</a>
+    <a class="btn btn-primary float-right" href="{{next}}">Nexts</a>
 </div>
-{% endblock %}
+    <link  href="{{url_for('static',filename='node_modules/viewerjs/dist/viewer.css')}}" rel="stylesheet">
+    <script src="{{url_for('static',filename='node_modules/viewerjs/dist/viewer.js')}}"></script>
+    <script>
+function image_viewer(post_id){
+    new Viewer(document.getElementById('images_'+post_id));
+}
+function unlike(post, reblog){
+		$.ajax({
+			type: 'POST',
+			url: 'localhost:5000/api/unlike',
+			data: '{"name":"jonas"}', // or JSON.stringify ({name: 'jonas'}),
+			success: function(data) { alert('data: ' + data); },
+			contentType: "application/json",
+			dataType: 'json'
+		});
+}
 
+var likes = {{like_list|safe}};
+
+likes.forEach( function(s) {
+    console.log(s);
+    image_viewer(s[0]);
+} );
+
+
+</script>
+{% endblock %}
 </div>
