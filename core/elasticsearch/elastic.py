@@ -8,7 +8,7 @@ es = Elasticsearch()
 
 
 def delete_like(post_id):
-    es.delete(post_id)
+    es.delete(id=post_id, doc_type=doc_type, index=index)
 
 
 def get_max_elastic_id():

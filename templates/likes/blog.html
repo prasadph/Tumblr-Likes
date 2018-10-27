@@ -40,7 +40,7 @@ console.log("like");
         data = {"id": post , "reblog_key":reblog };
 		$.post({
 			type: 'POST',
-			url: 'http://localhost:5000/api/unlike',
+			url: '/api/unlike',
 			data: JSON.stringify(data),
 			success: function(data) { alert('data: ' + data); },
 			contentType: "application/json",
@@ -53,7 +53,7 @@ console.log("like");
         data = {"id": post , "reblog_key":reblog };
 		$.post({
 			type: 'POST',
-			url: 'http://localhost:5000/api/like',
+			url: '/api/like',
 			data: JSON.stringify(data),
 			success: function(data) { alert('data: ' + data); },
 			contentType: "application/json",
