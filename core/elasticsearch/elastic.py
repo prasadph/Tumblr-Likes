@@ -7,6 +7,10 @@ from config import index, doc_type
 es = Elasticsearch()
 
 
+def delete_like(post_id):
+    es.delete(post_id)
+
+
 def get_max_elastic_id():
     s = Search(using=es, index=index)
     s.aggs.bucket("maxm", "max", field='liked_timestamp')
