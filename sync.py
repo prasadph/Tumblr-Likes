@@ -7,7 +7,7 @@ import pytumblr
 import requests
 from elasticsearch import Elasticsearch
 
-from config import tumblr_config, image_repo
+from config import tumblr_config, image_repo, host
 from core.elasticsearch.elastic import get_max_elastic_id, save_like
 
 logging.basicConfig(filename='logs/tumblr_index.log', level=logging.DEBUG)
@@ -16,7 +16,7 @@ logging.basicConfig(filename='logs/tumblr_index.log', level=logging.DEBUG)
 client = pytumblr.TumblrRestClient(
     *tumblr_config
 )
-es = Elasticsearch()
+es = Elasticsearch(host=host)
 
 limit = 50
 # Tumblr API give max 50 likes when used with after parameter

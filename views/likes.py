@@ -10,6 +10,10 @@ from core.elasticsearch.elastic import get_all_blogs, get_search_result, fetch_p
 
 template_root = "likes/"
 
+@app.route("/test", methods=['GET'])
+def test():
+    
+    return "test1"
 
 @app.route("/api/unlike", methods=['POST'])
 def unlike():
@@ -49,6 +53,8 @@ def likes():
     args['offset'] = offset - size
     prev_link = url_for(request.endpoint, **args)
     title = search
+    if tag:
+        title=tag
     blogs = get_all_blogs()
     like = [[post["id"], post['reblog_key']] for post in posts]
     return render_template(

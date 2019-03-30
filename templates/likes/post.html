@@ -1,47 +1,39 @@
-<div class="post" style="border: 2px ; border-style: solid; margin: 10px;padding: 10px">
-	<div style="margin: 2px;padding: 2px">
-		<a href="{{post.post_url}}">{{post.blog_name}}</a>
-	</div>
-	<div class="lead">
-	    {{post.title}}{{post.type}}
-	</div>
-	<div>
-	    {{post.caption|safe}}
-	</div>
-	<div>
-	    {{post.summary}}
-	</div>
+<div class="card">
+    <div class="card-header">
+        <a href="{{post.post_url}}">{{post.blog_name}}</a>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Special title treatment</h5>
+        {% if post.type == "video" %}
+        <div>
+            {{post.player[0]["embed_code"] | safe }}
+        </div>
+        {% endif %}
+        {% if post.type == 'text' %}
+        <div>{{post.body |safe}}
+        </div>
+        {% endif %}
+        <div id="images_{{post.id}}">
+            {% for photo in post.photos %}
+            <img width="400px" src="{{photo.original_size.url|local}}" class="img-fluid">
+            {% endfor %}
+        </div>
+        <p class="card-text">
+        <div data-toggle="tooltip" title="{{post.summary}}">
+            {{post.caption|safe}}
+        </div>
+        </p>
+        <button class="btn btn-danger" onclick="unlike({{post.id}},'{{post.reblog_key}}')">UnLike</button>
+        <button class="btn btn-outline-danger" onclick="like({{post.id}},'{{post.reblog_key}}')">Like</button>
+    </div>
+    <div class="card-footer text-muted">
+        <div>
+            {% for tag in post.tags %}
+            <a href="{{url_for('likes',tag=tag)}}">
+                <small> #{{tag}}</small>
+            </a>
+            {% endfor %}
+        </div>
 
-	<div>
-		{{post.body |safe}}
-	</div>
-	<div>
-		{{post.answer|safe}}
-	</div>
-	{% if post.type == "video" %}
-	<div>
-		{{post.player[0]["embed_code"] | safe }}
-	</div>
-	{% else %}
-	{% endif %}
-
-	<div>
-
-		<div>
-			<div id="images_{{post.id}}">
-			{% for photo in post.photos %}
-				<img width="400px" src="{{photo.original_size.url|local}}" class="img-fluid">
-			{% endfor %}
-			</div>
-		</div>
-
-		<div>
-		{% for tag in post.tags %}
-		    <a href="{{url_for('likes',tag=tag)}}"><small> #{{tag}}</small></a>
-		{% endfor %}
-		</div>
-	</div>
-	<button class="btn btn-danger" onclick="unlike({{post.id}},'{{post.reblog_key}}')" >UnLike</button>
-	<button class="btn btn-outline-danger" onclick="like({{post.id}},'{{post.reblog_key}}')">Like</button>
-
+    </div>
 </div>

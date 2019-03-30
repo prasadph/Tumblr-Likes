@@ -19,9 +19,13 @@
 {% block content %}
 
 {% for post in posts %}
-<div>
-	{% include "likes/post.html" %}
-</div>
+
+	
+            {% for photo in post.photos %}
+            <img width="400px" src="{{photo.original_size.url|local}}" class="img-fluid">
+            {% endfor %}
+       
+
 {% endfor %}
 {% include "likes/pagination.html" %}
 <div class="fixed-bottom">

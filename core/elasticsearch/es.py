@@ -2,12 +2,12 @@ import click
 from elasticsearch import Elasticsearch
 from flask import g
 from flask.cli import with_appcontext
-from config import index
+from config import index, host
 
 
 def get_es():
     if 'es' not in g:
-        g.es = Elasticsearch()
+        g.es = Elasticsearch(host=host)
     return g.es
 
 

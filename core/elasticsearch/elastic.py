@@ -1,10 +1,10 @@
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import Search,Q
 from elasticsearch_dsl.query import MultiMatch
 
-from config import index, doc_type
+from config import index, doc_type, host
 
-es = Elasticsearch()
+es = Elasticsearch(host=host)
 
 
 def delete_like(post_id):
@@ -50,6 +50,10 @@ def get_search_result(**params):
         s = s.filter("term", blog_name__keyword=params.get("blog_name"))
     if params.get("tag"):
         s = s.filter("term", tags__keyword=params.get("tag"))
+    # s = s.filter('nested', filter=Q('exists', field="tags"))
+    # s = s.filter("exists",field="tags")
+    # s = s.filter("bool",must_not=[Q('exists', field="tags")])
+    # s = s.extra(search_after=['152881177616', 0])
     print(s.to_dict())
     response = s[params["offset"]:params["size"] + params["offset"]].execute()
     return response
