@@ -10,7 +10,7 @@
         </div>
         {% endif %}
         {% if post.type == 'text' %}
-        <div>{{post.body |safe}}
+        <div>{{post.body |ttimages|safe}}
         </div>
         {% endif %}
         <div id="images_{{post.id}}">

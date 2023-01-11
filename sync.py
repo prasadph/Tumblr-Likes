@@ -59,6 +59,7 @@ def fetch_likes(offset):
 def process_like(like):
     print(like["liked_timestamp"], like["tags"],
           like["post_url"], like["summary"])
+    print(like)
     if like.get("photos"):
         process_images_list(like["photos"])
     else:
@@ -71,8 +72,8 @@ def process_like(like):
 
 def process_images_list(photos):
     for photo in photos:
-        # print(photo["original_size"]['url'])
         url = photo["original_size"]['url']
+        print(url)
         filename = image_repo + url.rsplit('/', 1)[1]
         if not os.path.isfile(filename):
             save_image(url, filename)

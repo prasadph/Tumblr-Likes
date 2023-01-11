@@ -100,3 +100,21 @@ def local_pic(code):
 def get_local_url_pic(url):
     f = "/photos/"
     return f + url.rsplit('/', 1)[-1]
+
+
+@app.template_filter('ttimages')
+def get_modifed_body(body):
+    from pyquery import PyQuery as pq
+    
+    f = pq(body)
+    out = ""
+    for image in f("img"):
+            src = image.get("src")
+            filename = "/photos/" + src.rsplit('/', 1)[1]
+            if "media.tumblr.com" not in src: 
+                import hashlib
+                m = hashlib.shake_128(str.encode(src)).hexdigest(5)
+                filename = "/photos/" + str(m)+"-" +src.rsplit('/', 1)[1]
+            out = out + f'<img src="{filename}">'
+                
+    return out

@@ -54,6 +54,7 @@ def get_search_result(**params):
     # s = s.filter("exists",field="tags")
     # s = s.filter("bool",must_not=[Q('exists', field="tags")])
     # s = s.extra(search_after=['152881177616', 0])
+    # s = s.filter("term", type__keyword="text")
     print(s.to_dict())
     response = s[params["offset"]:params["size"] + params["offset"]].execute()
     return response
