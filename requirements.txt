@@ -19,7 +19,7 @@ marshmallow==2.17.0
 mccabe==0.6.1
 oauthlib==2.1.0
 pycodestyle==2.4.0
-PyJWT==1.7.1
+PyJWT==2.4.0
 pylint==2.1.1
 python-dateutil==2.7.3
 PyTumblr==0.0.8
