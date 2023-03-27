@@ -23,7 +23,7 @@ PyJWT==1.7.1
 pylint==2.1.1
 python-dateutil==2.7.3
 PyTumblr==0.0.8
-redis==2.10.6
+redis==4.5.3
 requests==2.21.0
 requests-oauthlib==1.0.0
 rq==0.12.0
