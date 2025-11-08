@@ -63,6 +63,7 @@ query = {
 # Get total count first for progress estimation
 count_query = query.copy()
 count_query["size"] = 0
+count_query["track_total_hits"] = True  # ES 7.x: Get accurate count
 count_resp = es.search(index=index, body=count_query)
 total_posts = count_resp['hits']['total']['value'] if isinstance(count_resp['hits']['total'], dict) else count_resp['hits']['total']
 estimated_batches = (total_posts + 999) // 1000  # Round up

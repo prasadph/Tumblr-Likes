@@ -5,8 +5,8 @@ description = "Tumblr Likes Browser - Flask app for browsing and searching liked
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "elasticsearch==6.3.1",
-    "elasticsearch-dsl==6.4.0",
+    "elasticsearch==7.17.9",
+    "elasticsearch-dsl==7.4.1",
     "Flask==3.0.0",
     "humanize==3.14.0",
     "Jinja2==3.1.4",

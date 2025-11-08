@@ -29,7 +29,10 @@ def update_likes():
     offset = get_max_elastic_id()
 
     if offset:
-        offset = int(offset) // 1000 - 1
+
+        # Use the max timestamp directly (subtract 1 to get posts after this point)
+        # Note: liked_timestamp is in seconds, not milliseconds, so don't divide by 1000
+        offset = int(offset) - 1
     else:
         offset = 1
     print(offset)

@@ -12,7 +12,8 @@ When you run `flask update-es` or `python sync.py`, the system:
 
 1. **Finds the latest post** in Elasticsearch using `get_max_elastic_id()`
    - Gets the maximum `liked_timestamp` from your existing indexed posts
-   - Converts it to the offset format: `timestamp // 1000 - 1`
+   - Converts it to the offset format: `timestamp - 1` (to get posts after this point)
+   - Note: `liked_timestamp` is in seconds, not milliseconds, so no division needed
 
 2. **Fetches new posts** from Tumblr API
    - Starts from the timestamp of your most recent indexed post
@@ -124,7 +125,7 @@ python get_html_posts_images.py
 ```
 1. Get max liked_timestamp from Elasticsearch
    ↓
-2. Calculate offset: (max_timestamp // 1000) - 1
+2. Calculate offset: max_timestamp - 1 (to get posts after this point)
    ↓
 3. Fetch 50 posts from Tumblr API (after=offset)
    ↓
