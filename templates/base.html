@@ -7,25 +7,151 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ url_for('static',filename='node_modules/bootstrap/dist/css/bootstrap.min.css')}}" crossorigin="anonymous">
+    
+    <!-- Custom CSS -->
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding-top: 0;
+      }
+      .post-card {
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+      }
+      .post-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      }
+      .post-card .card-body {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .post-images-gallery {
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+      .post-image-container {
+        position: relative;
+        margin: 0.5rem 0;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #f0f0f0;
+        width: 100%;
+        min-height: 200px;
+        max-height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .post-image {
+        cursor: pointer;
+        max-width: 100%;
+        max-height: 500px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        border-radius: 8px;
+      }
+      .post-image:hover {
+        transform: scale(1.03);
+        opacity: 0.95;
+      }
+      /* Responsive image sizing */
+      @media (max-width: 768px) {
+        .post-image-container {
+          max-height: 400px;
+          min-height: 150px;
+        }
+        .post-image {
+          max-height: 400px;
+        }
+      }
+      .post-image-container::after {
+        content: '🔍';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 16px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+      .post-image-container:hover::after {
+        opacity: 1;
+      }
+      .post-text-content .post-image-container {
+        margin: 0.75rem 0;
+        max-height: 500px;
+      }
+      .post-type-icon {
+        color: #6c757d;
+        display: inline-flex;
+        align-items: center;
+        cursor: help;
+        transition: color 0.2s;
+      }
+      .post-type-icon:hover {
+        color: #495057;
+      }
+      .tag-link {
+        text-decoration: none;
+        margin: 0.25rem;
+        padding: 0.35rem 0.65rem;
+        font-size: 0.875rem;
+        display: inline-block;
+      }
+      .tag-link:hover {
+        text-decoration: none;
+        transform: scale(1.05);
+      }
+      .card-footer {
+        padding: 0.75rem 1rem;
+        margin-top: auto;
+      }
+      .flash {
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+        background-color: #d4edda;
+        color: #155724;
+      }
+      main.container {
+        padding-top: 1rem;
+      }
+    </style>
 
-    <title>{% block title %}{% endblock %} - Tumblr </title>
+    <title>{% block title %}{% endblock %} - Tumblr Likes</title>
   </head>
   <body>
     {% include "navbar.html" %}
-    <section class="content">
+    <main class="container my-4">
       <header>
         {% block header %}{% endblock %}
       </header>
       {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
+        <div class="flash alert alert-success">{{ message }}</div>
       {% endfor %}
       {% block content %}{% endblock %}
-    </section>
+    </main>
 
     <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="{{ url_for('static',filename='node_modules/jquery/dist/jquery.min.js')}}" crossorigin="anonymous"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous"></script> -->
-    <script src="{{ url_for('static',filename='node_modules/bootstrap/dist/js/bootstrap.min.js')}}" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS (no jQuery needed in Bootstrap 5) -->
+    <script src="{{ url_for('static',filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js')}}" crossorigin="anonymous"></script>
   </body>
 </html>

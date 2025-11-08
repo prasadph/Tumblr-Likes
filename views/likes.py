@@ -118,6 +118,55 @@ def get_modifed_body(body):
                 import hashlib
                 m = hashlib.shake_128(str.encode(src)).hexdigest(5)
                 filename = "/photos/" + str(m)+"-" +src.rsplit('/', 1)[1]
-            out = out + f'<img src="{filename}">'
+            # Wrap each image in a container for proper styling and gallery
+            out = out + f'<div class="post-image-container"><img src="{filename}" class="post-image" alt="Post image" loading="lazy"></div>'
                 
     return out
+
+
+@app.template_filter('relativetime')
+def relative_time(timestamp):
+    """Convert timestamp to relative time string using humanize"""
+    if not timestamp:
+        return "Unknown"
+    
+    try:
+        import humanize
+        
+        # Handle both epoch seconds and epoch milliseconds
+        if isinstance(timestamp, (int, float)):
+            if timestamp > 1e10:  # Likely milliseconds
+                timestamp = timestamp / 1000
+            dt = datetime.fromtimestamp(timestamp)
+        else:
+            dt = timestamp
+        
+        return humanize.naturaltime(dt)
+    except ImportError:
+        # Fallback if humanize is not installed
+        try:
+            if isinstance(timestamp, (int, float)):
+                if timestamp > 1e10:
+                    timestamp = timestamp / 1000
+                dt = datetime.fromtimestamp(timestamp)
+            else:
+                dt = timestamp
+            
+            now = datetime.now()
+            diff = now - dt
+            seconds = diff.total_seconds()
+            
+            if seconds < 60:
+                return "just now"
+            elif seconds < 3600:
+                return f"{int(seconds/60)} minute{'s' if int(seconds/60) != 1 else ''} ago"
+            elif seconds < 86400:
+                return f"{int(seconds/3600)} hour{'s' if int(seconds/3600) != 1 else ''} ago"
+            elif seconds < 604800:
+                return f"{int(seconds/86400)} day{'s' if int(seconds/86400) != 1 else ''} ago"
+            else:
+                return f"{int(seconds/604800)} week{'s' if int(seconds/604800) != 1 else ''} ago"
+        except Exception:
+            return "Unknown"
+    except Exception:
+        return "Unknown"

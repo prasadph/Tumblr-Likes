@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "elasticsearch-dsl==6.2.1",
+    "humanize==3.14.0",
     "pyquery==1.4.3",
     "pytumblr==0.0.8",
     "requests==2.21.0",

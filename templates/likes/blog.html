@@ -1,39 +1,57 @@
 {% extends 'base.html' %}
 
-<div class="container container-fluid">
-	
 {% block header %}
-  <h1>{% block title %}{{title}}{% endblock %}</h1>
-    Showing {{offset}}- {{offset+size}} of {{count}} results
-    <form method="GET" action="{{url_for('likes')}}">
-		<select name="blog_name">
-			<option  >----</option>
-			{% for blog in blogs %}
-			<option {{'selected' if blog == blog_name}} value="{{blog}}">{{blog}}</option>
-			{% endfor %}
-		</select>
-		<input type="submit" name="">
-	</form>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h4 mb-1">{% block title %}{{title or 'All Liked Posts'}}{% endblock %}</h1>
+        <p class="text-muted small mb-0">Showing {{offset + 1}}-{{offset + size if offset + size < count else count}} of {{count}} results</p>
+    </div>
+    <form method="GET" action="{{url_for('likes')}}" class="d-flex gap-2">
+        <input type="hidden" name="search" value="{{search or ''}}">
+        <input type="hidden" name="tag" value="{{tag or ''}}">
+        <select name="blog_name" class="form-select form-select-sm" onchange="this.form.submit()" style="max-width: 200px;">
+            <option value="">All Blogs</option>
+            {% for blog in blogs %}
+            <option {{'selected' if blog == blog_name}} value="{{blog}}">{{blog}}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
 {% endblock %}
 
 {% block content %}
 
-{% for post in posts %}
-<div>
-	{% include "likes/post.html" %}
+<div class="row g-3">
+    {% for post in posts %}
+    <div class="col-12 col-md-6 col-lg-4">
+        {% include "likes/post.html" %}
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
-{% include "likes/pagination.html" %}
-<div class="fixed-bottom">
-    <a class="btn btn-primary" href="{{prev}}">Prev</a>
-    <a class="btn btn-primary float-right" href="{{next}}">Nexts</a>
-</div>
-    <link  href="{{url_for('static',filename='node_modules/viewerjs/dist/viewer.css')}}" rel="stylesheet">
-    <script src="{{url_for('static',filename='node_modules/viewerjs/dist/viewer.js')}}"></script>
 
-    <script>
-    var likes = {{like_list|safe}};
-    </script>
-    <script src="/static/js/post.js"></script>
-{% endblock %}
+{% if count > size %}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-5">
+    <a class="btn btn-outline-primary {{'disabled' if offset == 0}}" href="{{prev if offset > 0 else '#'}}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+        </svg>
+        Previous
+    </a>
+    <span class="text-muted">Page {{(offset // size) + 1}} of {{(count // size) + 1}}</span>
+    <a class="btn btn-outline-primary {{'disabled' if offset + size >= count}}" href="{{next if offset + size < count else '#'}}">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+    </a>
 </div>
+{% endif %}
+
+<link href="{{url_for('static',filename='node_modules/photoswipe/dist/photoswipe.css')}}" rel="stylesheet">
+
+<script>
+var likes = {{like_list|safe}};
+</script>
+<script src="{{url_for('static',filename='node_modules/photoswipe/dist/umd/photoswipe.umd.min.js')}}"></script>
+<script src="{{url_for('static',filename='js/post.js')}}"></script>
+{% endblock %}
