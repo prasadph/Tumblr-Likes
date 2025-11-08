@@ -5,7 +5,7 @@
   "author": "Prasad Honavar",
   "license": "MIT",
   "dependencies": {
-    "bootstrap": "^5.3.2",
-    "photoswipe": "^5.3.4"
+    "bootstrap": "5.3.8",
+    "photoswipe": "5.4.4"
   }
 }
