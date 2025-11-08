@@ -6,19 +6,19 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "elasticsearch==6.3.1",
-    "elasticsearch-dsl==6.2.1",
-    "Flask==1.0.2",
+    "elasticsearch-dsl==6.4.0",
+    "Flask==3.0.0",
     "humanize==3.14.0",
-    "Jinja2==2.10",
-    "pyquery==1.4.3",
+    "Jinja2==3.1.4",
+    "pyquery==2.0.1",
     "python-dateutil==2.9.0",
-    "pytumblr==0.0.8",
+    "pytumblr==0.1.2",
     "requests==2.32.3",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "autopep8==1.4.1",
-    "isort==4.3.4",
-    "pylint==2.1.1",
+    "autopep8==2.3.2",
+    "isort==7.0.0",
+    "pylint==4.0.2",
 ]

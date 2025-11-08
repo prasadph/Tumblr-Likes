@@ -72,3 +72,4 @@ extra/tumblr_*.gif
 extra/*
 DataScience.ipynb
 *.crt
+.env.local
