@@ -42,7 +42,11 @@ def likes():
 
     posts = get_search_result(offset=offset, search=search, size=size, timestamp=timestamp,
                               blog_name=blog_name, tag=tag)
-    count = posts['hits']['total']
+    # ES 7.x: hits.total is an object with .value, ES 6.x: it's a number
+    if hasattr(posts.hits.total, 'value'):
+        count = posts.hits.total.value
+    else:
+        count = posts.hits.total
     posts = [post["_source"] for post in posts["hits"]["hits"]]
     
     # Get oldest and latest post timestamps
@@ -110,7 +114,7 @@ def stats():
     
     # Get overall count
     s_all = Search(using=es, index=index)
-    s_all = s_all[:0]  # Don't return documents, just count
+    s_all = s_all[:0].extra(track_total_hits=True)  # Don't return documents, just count, track all hits
     response_all = s_all.execute()
     count_all = response_all.hits.total.value if hasattr(response_all.hits.total, 'value') else response_all.hits.total
     
@@ -118,7 +122,7 @@ def stats():
     def get_count_since(timestamp):
         s = Search(using=es, index=index)
         s = s.filter("range", liked_timestamp={"gte": timestamp})
-        s = s[:0]  # Don't return documents, just count
+        s = s[:0].extra(track_total_hits=True)  # Don't return documents, just count, track all hits
         response = s.execute()
         return response.hits.total.value if hasattr(response.hits.total, 'value') else response.hits.total
     

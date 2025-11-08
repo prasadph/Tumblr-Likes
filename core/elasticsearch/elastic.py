@@ -1,14 +1,15 @@
+import logging
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search,Q
 from elasticsearch_dsl.query import MultiMatch
 
-from config import index, doc_type, host
+from config import index, host
 
 es = Elasticsearch(host=host)
 
 
 def delete_like(post_id):
-    es.delete(id=post_id, doc_type=doc_type, index=index)
+    es.delete(id=post_id, index=index)
 
 
 def get_max_elastic_id():
@@ -19,7 +20,25 @@ def get_max_elastic_id():
 
 
 def save_like(like):
-    return es.index(index=index, doc_type=doc_type, id=like["id"], body=like)
+    # Use op_type='create' to prevent overwriting existing posts
+    # This preserves old posts with original images (before they got banned)
+    try:
+        return es.index(index=index, id=like["id"], body=like, op_type='create')
+    except Exception as e:
+        # If document already exists, that's okay - we don't want to overwrite
+        error_str = str(e).lower()
+        if any(term in error_str for term in [
+            'document_already_exists_exception',
+            'resource_already_exists_exception', 
+            'version_conflict_engine_exception',
+            'conflicterror',
+            'document already exists'
+        ]):
+            logging.debug(f"Post {like['id']} already exists, skipping to preserve original data")
+            return {"result": "skipped", "id": like["id"]}
+        else:
+            # Re-raise other exceptions
+            raise
 
 
 def get_all_blogs():
@@ -74,14 +93,18 @@ def get_top_tags_recent(limit=20, days=30):
 
 
 def fetch_post(code):
-    return es.get(index=index, doc_type=doc_type, id=code)
+    return es.get(index=index, id=code)
 
 
 def get_search_result(**params):
     s = Search(using=es, index=index) \
         .filter("range", liked_timestamp={"lt": params["timestamp"]}) \
-        .filter(MultiMatch(query=params["search"], type="phrase_prefix", lenient=True)) \
         .sort({"liked_timestamp": "desc"})
+    
+    # Only add MultiMatch filter if search query is not empty
+    if params.get("search") and params["search"].strip():
+        s = s.filter(MultiMatch(query=params["search"], type="phrase_prefix", lenient=True))
+    
     if params.get("blog_name"):
         s = s.filter("term", blog_name__keyword=params.get("blog_name"))
     if params.get("tag"):
@@ -92,15 +115,20 @@ def get_search_result(**params):
     # s = s.extra(search_after=['152881177616', 0])
     # s = s.filter("term", type__keyword="text")
     print(s.to_dict())
-    response = s[params["offset"]:params["size"] + params["offset"]].execute()
+    # Enable track_total_hits for accurate counts in ES 7.x
+    response = s[params["offset"]:params["size"] + params["offset"]].extra(track_total_hits=True).execute()
     return response
 
 
 def get_timestamp_range(**params):
     """Get min and max liked_timestamp for the current search/filter"""
     s = Search(using=es, index=index) \
-        .filter("range", liked_timestamp={"lt": params["timestamp"]}) \
-        .filter(MultiMatch(query=params["search"], type="phrase_prefix", lenient=True))
+        .filter("range", liked_timestamp={"lt": params["timestamp"]})
+    
+    # Only add MultiMatch filter if search query is not empty
+    if params.get("search") and params["search"].strip():
+        s = s.filter(MultiMatch(query=params["search"], type="phrase_prefix", lenient=True))
+    
     if params.get("blog_name"):
         s = s.filter("term", blog_name__keyword=params.get("blog_name"))
     if params.get("tag"):
@@ -131,8 +159,12 @@ def get_timestamp_range(**params):
 def get_top_tags_for_search(limit=5, **params):
     """Get top tags by count for the current search/filter context"""
     s = Search(using=es, index=index) \
-        .filter("range", liked_timestamp={"lt": params["timestamp"]}) \
-        .filter(MultiMatch(query=params["search"], type="phrase_prefix", lenient=True))
+        .filter("range", liked_timestamp={"lt": params["timestamp"]})
+    
+    # Only add MultiMatch filter if search query is not empty
+    if params.get("search") and params["search"].strip():
+        s = s.filter(MultiMatch(query=params["search"], type="phrase_prefix", lenient=True))
+    
     if params.get("blog_name"):
         s = s.filter("term", blog_name__keyword=params.get("blog_name"))
     if params.get("tag"):
