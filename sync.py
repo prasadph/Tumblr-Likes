@@ -78,10 +78,27 @@ def process_images_list(photos):
             save_image(url, filename)
 
 
+# Create a session for connection pooling (faster downloads)
+_session = None
+
+def get_session():
+    global _session
+    if _session is None:
+        _session = requests.Session()
+        # Reuse connections for faster downloads
+        _session.headers.update({'User-Agent': 'Mozilla/5.0'})
+    return _session
+
 def save_image(url, filename):
     logging.info("Downloading %s" % url)
-    r = requests.get(url, allow_redirects=True)
-    open(filename, 'wb').write(r.content)
+    session = get_session()
+    # Add timeout to prevent hanging on slow downloads (10 seconds)
+    r = session.get(url, allow_redirects=True, timeout=10)
+    r.raise_for_status()  # Raise exception for bad status codes
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(filename) if os.path.dirname(filename) else '.', exist_ok=True)
+    with open(filename, 'wb') as f:
+        f.write(r.content)
 
 
 if __name__ == '__main__':
