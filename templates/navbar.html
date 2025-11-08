@@ -14,7 +14,10 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="{{url_for('likes')}}">All Likes</a>
+                    <a class="nav-link {{'active' if request.endpoint == 'likes' else ''}}" href="{{url_for('likes')}}">All Likes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{'active' if request.endpoint == 'stats' else ''}}" href="{{url_for('stats')}}">Stats</a>
                 </li>
             </ul>
             <form class="d-flex" action="{{url_for('likes')}}" method="GET">

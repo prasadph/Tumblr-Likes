@@ -5,6 +5,29 @@
     <div>
         <h1 class="h4 mb-1">{% block title %}{{title or 'All Liked Posts'}}{% endblock %}</h1>
         <p class="text-muted small mb-0">Showing {{offset + 1}}-{{offset + size if offset + size < count else count}} of {{count}} results</p>
+        {% if oldest_timestamp or latest_timestamp %}
+        <div class="d-flex gap-3 mt-2">
+            {% if oldest_timestamp %}
+            <small class="text-muted">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-clock-history me-1" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1.001.143zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c.16.36.345.706.555 1.038l-.845.535c-.11-.253-.24-.5-.384-.742zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/>
+                    <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                    <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                </svg>
+                Oldest: {{oldest_timestamp | relativetime}}
+            </small>
+            {% endif %}
+            {% if latest_timestamp %}
+            <small class="text-muted">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-clock me-1" viewBox="0 0 16 16">
+                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                </svg>
+                Latest: {{latest_timestamp | relativetime}}
+            </small>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
     <form method="GET" action="{{url_for('likes')}}" class="d-flex gap-2">
         <input type="hidden" name="search" value="{{search or ''}}">
@@ -17,9 +40,43 @@
         </select>
     </form>
 </div>
+
+{% if top_tags %}
+<div class="mb-3">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <small class="text-muted fw-bold">Top tags:</small>
+        {% for tag in top_tags %}
+        <a href="{{url_for('likes', tag=tag.name, search=search or '', blog_name=blog_name or '')}}" 
+           class="badge bg-secondary text-white text-decoration-none" 
+           style="font-size: 0.8rem; padding: 0.4rem 0.7rem;">
+            #{{tag.name}}
+            <span class="badge bg-light text-dark ms-1" style="font-size: 0.7rem;">{{tag.count}}</span>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
+
+{% if count > size %}
+<div class="pagination-top mb-3 d-flex justify-content-between align-items-center">
+    <a class="btn btn-outline-primary btn-sm {{'disabled' if offset == 0}}" href="{{prev if offset > 0 else '#'}}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+        </svg>
+        Previous
+    </a>
+    <span class="text-muted small">Page {{(offset // size) + 1}} of {{(count // size) + 1}}</span>
+    <a class="btn btn-outline-primary btn-sm {{'disabled' if offset + size >= count}}" href="{{next if offset + size < count else '#'}}">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+    </a>
+</div>
+{% endif %}
 
 <div class="row g-3">
     {% for post in posts %}
@@ -30,7 +87,7 @@
 </div>
 
 {% if count > size %}
-<div class="d-flex justify-content-between align-items-center mt-4 mb-5">
+<div class="pagination-bottom d-flex justify-content-between align-items-center mt-4 mb-5">
     <a class="btn btn-outline-primary {{'disabled' if offset == 0}}" href="{{prev if offset > 0 else '#'}}">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -45,12 +102,32 @@
         </svg>
     </a>
 </div>
+
+<!-- Floating pagination (sticky at bottom) -->
+<div class="pagination-floating">
+    <a class="btn btn-outline-primary btn-sm {{'disabled' if offset == 0}}" href="{{prev if offset > 0 else '#'}}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+        </svg>
+        <span class="d-none d-sm-inline">Previous</span>
+    </a>
+    <span class="text-muted fw-bold">Page {{(offset // size) + 1}} / {{(count // size) + 1}}</span>
+    <a class="btn btn-outline-primary btn-sm {{'disabled' if offset + size >= count}}" href="{{next if offset + size < count else '#'}}">
+        <span class="d-none d-sm-inline">Next</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+    </a>
+</div>
 {% endif %}
 
 <link href="{{url_for('static',filename='node_modules/photoswipe/dist/photoswipe.css')}}" rel="stylesheet">
 
 <script>
-var likes = {{like_list|safe}};
+var likesDict = {{like_dict|safe}};
+var likes = Object.keys(likesDict).map(function(id) {
+    return [parseInt(id), likesDict[id]];
+});
 </script>
 <script src="{{url_for('static',filename='node_modules/photoswipe/dist/umd/photoswipe.umd.min.js')}}"></script>
 <script src="{{url_for('static',filename='js/post.js')}}"></script>

@@ -6,7 +6,7 @@ from flask import send_file
 import core.tumblr.likes as tumblr_likes
 from app import app
 from config import image_repo, posts_per_page
-from core.elasticsearch.elastic import get_all_blogs, get_search_result, fetch_post
+from core.elasticsearch.elastic import get_all_blogs, get_search_result, fetch_post, get_top_tags, get_top_tags_recent, get_timestamp_range, get_top_tags_for_search
 
 template_root = "likes/"
 
@@ -44,6 +44,15 @@ def likes():
                               blog_name=blog_name, tag=tag)
     count = posts['hits']['total']
     posts = [post["_source"] for post in posts["hits"]["hits"]]
+    
+    # Get oldest and latest post timestamps
+    timestamp_range = get_timestamp_range(search=search, timestamp=timestamp,
+                                          blog_name=blog_name, tag=tag)
+    
+    # Get top 5 tags for current search context
+    top_tags = get_top_tags_for_search(limit=5, search=search, timestamp=timestamp,
+                                       blog_name=blog_name, tag=tag)
+    
     args = request.args.copy()
 
     if search:
@@ -56,7 +65,8 @@ def likes():
     if tag:
         title=tag
     blogs = get_all_blogs()
-    like = [[post["id"], post['reblog_key']] for post in posts]
+    # Convert to dict for cleaner template access
+    like_dict = {post["id"]: post['reblog_key'] for post in posts}
     return render_template(
         template_root + 'blog.html',
         posts=posts,
@@ -69,7 +79,10 @@ def likes():
         offset=offset,
         blogs=blogs,
         blog_name=blog_name,
-        like_list=like,
+        like_dict=like_dict,
+        oldest_timestamp=timestamp_range['min_timestamp'],
+        latest_timestamp=timestamp_range['max_timestamp'],
+        top_tags=top_tags,
     )
 
 
@@ -78,6 +91,62 @@ def blog(code):
     post = fetch_post(code)
     post = post["_source"]
     return render_template(template_root + 'singlepost.html', post=post)
+
+
+@app.route("/stats")
+def stats():
+    """Display post counts for different time periods"""
+    from datetime import datetime, timedelta
+    from core.elasticsearch.elastic import es
+    from config import index
+    from elasticsearch_dsl import Search
+    
+    # Calculate timestamps
+    now = datetime.now()
+    timestamp_1day = int((now - timedelta(days=1)).timestamp())
+    timestamp_1week = int((now - timedelta(days=7)).timestamp())
+    timestamp_1month = int((now - timedelta(days=30)).timestamp())
+    timestamp_1year = int((now - timedelta(days=365)).timestamp())
+    
+    # Get overall count
+    s_all = Search(using=es, index=index)
+    s_all = s_all[:0]  # Don't return documents, just count
+    response_all = s_all.execute()
+    count_all = response_all.hits.total.value if hasattr(response_all.hits.total, 'value') else response_all.hits.total
+    
+    # Get counts for each time period
+    def get_count_since(timestamp):
+        s = Search(using=es, index=index)
+        s = s.filter("range", liked_timestamp={"gte": timestamp})
+        s = s[:0]  # Don't return documents, just count
+        response = s.execute()
+        return response.hits.total.value if hasattr(response.hits.total, 'value') else response.hits.total
+    
+    count_1day = get_count_since(timestamp_1day)
+    count_1week = get_count_since(timestamp_1week)
+    count_1month = get_count_since(timestamp_1month)
+    count_1year = get_count_since(timestamp_1year)
+    
+    # Get top tags for each time period
+    top_tags_all = get_top_tags(limit=20)
+    top_tags_1day = get_top_tags_recent(limit=20, days=1)
+    top_tags_1week = get_top_tags_recent(limit=20, days=7)
+    top_tags_1month = get_top_tags_recent(limit=20, days=30)
+    top_tags_1year = get_top_tags_recent(limit=20, days=365)
+    
+    return render_template(
+        template_root + 'stats.html',
+        count_all=count_all,
+        count_1day=count_1day,
+        count_1week=count_1week,
+        count_1month=count_1month,
+        count_1year=count_1year,
+        top_tags_all=top_tags_all,
+        top_tags_1day=top_tags_1day,
+        top_tags_1week=top_tags_1week,
+        top_tags_1month=top_tags_1month,
+        top_tags_1year=top_tags_1year
+    )
 
 
 @app.route("/photos/<code>")
@@ -122,6 +191,20 @@ def get_modifed_body(body):
             out = out + f'<div class="post-image-container"><img src="{filename}" class="post-image" alt="Post image" loading="lazy"></div>'
                 
     return out
+
+
+@app.template_filter('intcomma')
+def intcomma(value):
+    """Format number with commas (e.g., 1000 -> 1,000)"""
+    try:
+        import humanize
+        return humanize.intcomma(int(value))
+    except (ImportError, ValueError, TypeError):
+        # Fallback if humanize not available or value is invalid
+        try:
+            return f"{int(value):,}"
+        except (ValueError, TypeError):
+            return str(value)
 
 
 @app.template_filter('relativetime')
