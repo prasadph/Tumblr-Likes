@@ -59,25 +59,30 @@ query = {
         }
     },
     "size":10000,
-    # "from":0,
+    "sort":{'liked_timestamp':'desc'}
+    #"from":1000,
 }
 
 resp = es.search(index=index, body=query)
 print(len(resp['hits']['hits']))
 for post in resp['hits']['hits']:
+    import time
+
     if post['_source'].get('body'):
         figure = post['_source']['body']
         f = pq(figure)
         for image in f("img"):
+            print('here')
             src = image.get("src")
+            print(src)
             filename = image_repo + src.rsplit('/', 1)[1]
+            print(filename)
             if "media.tumblr.com" not in src: 
                 m = hashlib.shake_128(str.encode(src)).hexdigest(5)
                 filename = image_repo + str(m)+"-" +src.rsplit('/', 1)[1]
                 # print(filename)
                 pass
-        # print(figure)
-            
+
             if not os.path.isfile(filename):
                 print(src, filename)
                 save_image(src, filename)

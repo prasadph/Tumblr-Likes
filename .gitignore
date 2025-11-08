@@ -63,3 +63,12 @@ static/node_modules
 # PyCharm
 .idea
 config.py
+extra/tumblr_*.jpg
+extra/tumblr_*.png
+extra/tumblr_*.gif
+*.tar.gz
+*.json
+.ipynb_checkpoints/*
+extra/*
+DataScience.ipynb
+*.crt

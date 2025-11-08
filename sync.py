@@ -6,7 +6,7 @@ import time
 import pytumblr
 import requests
 from elasticsearch import Elasticsearch
-
+import time
 from config import tumblr_config, image_repo, host
 from core.elasticsearch.elastic import get_max_elastic_id, save_like
 
@@ -59,7 +59,6 @@ def fetch_likes(offset):
 def process_like(like):
     print(like["liked_timestamp"], like["tags"],
           like["post_url"], like["summary"])
-    print(like)
     if like.get("photos"):
         process_images_list(like["photos"])
     else:

@@ -32,7 +32,9 @@ services:
         - "5000:5000"
       volumes:
         - .:/app
-        - /home/prasad/tumblr:/media
+        - /mnt/d/Prasad/tumblr:/media
+      # networks:
+      #   - my_network
       depends_on:
         - "elasticsearch"
     kibana:
@@ -70,3 +72,8 @@ services:
 
 volumes:
     esdata1:
+
+# networks:
+#   my_network:
+#     external: true
+#     name: external_network

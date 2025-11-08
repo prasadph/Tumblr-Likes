@@ -1,0 +1,5 @@
+[Dolphin]
+SortRole=accesstime
+Timestamp=2019,1,5,0,5,58
+Version=4
+VisibleRoles=CustomizedDetails,Details_text,Details_size,Details_modificationtime,Details_width,Details_height,Details_creationtime,Details_accesstime

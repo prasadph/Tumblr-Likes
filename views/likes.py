@@ -88,6 +88,9 @@ def local_pic(code):
         mime = "image/jpg"
     elif code.endswith("gif"):
         mime = "image/gif"
+    elif code.endswith("webp"):
+        mime = "image/webp"
+    #handle webp and others
     with open(image_repo + code, 'rb') as bites:
         return send_file(
             io.BytesIO(bites.read()),

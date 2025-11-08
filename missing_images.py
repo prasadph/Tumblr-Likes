@@ -1,7 +1,8 @@
 import os
 import shutil
 from elasticsearch import Elasticsearch
-es = Elasticsearch()
+from config import tumblr_config, image_repo, host, index
+es = Elasticsearch(host=host)
 
 query = {
     "query": {
@@ -9,7 +10,7 @@ query = {
         }
     }
 }
-resp = es.search(index="tumblr_likes_3", body=query, scroll="10m",
+resp = es.search(index=index, body=query, scroll="10m",
                  size=1000, _source="photos.original_size.url")
 # print(resp)
 # exit()
@@ -19,7 +20,7 @@ while len(resp['hits']['hits']) > 0:
         if post["_source"].get("photos"):
             for photo in post["_source"]["photos"]:
                 url = photo["original_size"]["url"]
-                filename = "/home/prasad/tumblr/" + url.rsplit('/', 1)[1]
+                filename = image_repo + url.rsplit('/', 1)[1]
                 if not os.path.isfile(filename):
                     print(filename)
     print(i)
