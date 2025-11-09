@@ -4,7 +4,7 @@
 
 Run the backup script:
 ```bash
-./backup_elasticsearch.sh
+./scripts/backup_elasticsearch.sh
 ```
 
 Or manually:

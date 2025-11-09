@@ -213,29 +213,31 @@ Tumblr_Likes/
 ├── extra/                      # Legacy/experimental code
 │   └── tumblr.py              # Old sync script
 │
-└── Maintenance Scripts/
+└── scripts/                      # Maintenance and utility scripts
     ├── get_html_posts_images.py  # Extract images from HTML posts
     ├── missing_images.py         # Find missing image files
-    └── delete_images.py          # Clean up orphaned images
+    ├── delete_images.py          # Clean up orphaned images
+    ├── backup_elasticsearch.sh   # Backup Elasticsearch data
+    └── reindex_with_date_mapping.sh  # Reindex with date mappings
 ```
 
 ## 🔧 Maintenance Scripts
 
 ### Extract Images from HTML Posts
 ```bash
-python get_html_posts_images.py
+python scripts/get_html_posts_images.py
 ```
 Finds text posts with embedded images and downloads missing images.
 
 ### Find Missing Images
 ```bash
-python missing_images.py
+python scripts/missing_images.py
 ```
 Scans all posts and reports which referenced images are missing locally.
 
 ### Clean Up Orphaned Images
 ```bash
-python delete_images.py
+python scripts/delete_images.py
 ```
 Finds images in the directory that aren't referenced in any post and moves them to an "extra" folder.
 

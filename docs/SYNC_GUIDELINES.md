@@ -80,7 +80,7 @@ index_likes()  # Can be queued with RQ
 After running the main sync, you should also run `get_html_posts_images.py` to download images embedded in text/HTML posts:
 
 ```bash
-python get_html_posts_images.py
+python scripts/get_html_posts_images.py
 ```
 
 **Why?** The main sync only downloads images from photo posts. Text posts with embedded images in their HTML body are not processed. This script:
@@ -164,8 +164,8 @@ python get_html_posts_images.py
 - Check `image_repo` path in `config.py` exists and is writable
 - Verify disk space is available
 - Check network connectivity
-- Run `missing_images.py` to find missing images
-- Run `get_html_posts_images.py` for HTML post images
+- Run `scripts/missing_images.py` to find missing images
+- Run `scripts/get_html_posts_images.py` for HTML post images
 
 ### Duplicate Posts
 
@@ -205,12 +205,12 @@ python get_html_posts_images.py
 1. **Regular Syncs**: Run sync regularly (daily/weekly) rather than letting it accumulate
 2. **Complete Image Sync**: Always run both:
    - `flask update-es` (or `python sync.py`) - for photo post images
-   - `python get_html_posts_images.py` - for HTML/text post images
+   - `python scripts/get_html_posts_images.py` - for HTML/text post images
 3. **Monitor Logs**: Check `logs/tumblr_index.log` for issues
 4. **Disk Space**: Ensure `image_repo` has sufficient space for images
 5. **Backup**: Consider backing up Elasticsearch data periodically
 6. **Verify**: After sync, check web interface to verify new posts appear
-7. **HTML Images**: Run `get_html_posts_images.py` after each sync to ensure all images are downloaded
+7. **HTML Images**: Run `scripts/get_html_posts_images.py` after each sync to ensure all images are downloaded
 
 ## Advanced: Full Re-sync
 
@@ -234,7 +234,7 @@ If you need to re-sync everything from scratch:
 3. **Run sync**:
    ```bash
    flask update-es
-   python get_html_posts_images.py  # Don't forget HTML post images!
+   python scripts/get_html_posts_images.py  # Don't forget HTML post images!
    ```
 
 ## Monitoring Sync Progress
